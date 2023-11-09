@@ -1,7 +1,6 @@
 package org.example;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,14 +17,14 @@ public class TimeServlet extends HttpServlet {
     public static final String DATE_PATTERN = "yyy-MM-dd HH:mm:ss z";
     public static final String TIME_ZONE_PARAM_NAME = "timezone";
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html");
 
         resp.getWriter().write("<h1>Current time</h1>");
 
         ZoneId zone = ZoneId.of(getTimeZone(req));
 
-        resp.getWriter().write("<h2>zone: ${timeZone}</h2>".replace("${timeZone}", zone.toString()));
+        resp.getWriter().write("<h2>Time zone: ${timeZone}</h2>".replace("${timeZone}", zone.toString()));
         resp.getWriter().write("<br>");
 
         // Get current time

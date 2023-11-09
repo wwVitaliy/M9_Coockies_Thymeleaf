@@ -18,8 +18,8 @@ public class TimezoneValidateFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if (req.getParameterMap().containsKey(TIME_ZONE_PARAM_NAME)
-                && isValid(req.getParameter(TIME_ZONE_PARAM_NAME))) {
+        if (!req.getParameterMap().containsKey(TIME_ZONE_PARAM_NAME)
+                || isValid(req.getParameter(TIME_ZONE_PARAM_NAME))) {
             chain.doFilter(req, res);
         } else {
             res.setStatus(400);
@@ -31,7 +31,7 @@ public class TimezoneValidateFilter extends HttpFilter {
     private boolean isValid(String zoneFromQueryParam) {
         try {
             //Replace is needed to read "+"-sign as a part of query parameter, because it is read as space (" ")
-            ZoneId zoneId = ZoneId.of(zoneFromQueryParam.replace(" ", "+"));
+            ZoneId.of(zoneFromQueryParam.replace(" ", "+"));
         } catch (DateTimeException e){
             return false;
         }

@@ -20,7 +20,7 @@ dependencies {
 }
 
 war{
-    archiveFileName = "timezone.jar"
+    archiveFileName = "timezone.war"
 }
 
 test {
