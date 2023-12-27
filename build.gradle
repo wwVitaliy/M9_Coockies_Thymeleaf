@@ -22,7 +22,7 @@ dependencies {
 }
 
 war {
-    archiveFileName = "timezone.war"
+    archiveFileName = "time.war"
 }
 
 test {

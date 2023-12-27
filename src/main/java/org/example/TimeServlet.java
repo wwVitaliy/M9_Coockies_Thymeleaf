@@ -6,29 +6,46 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 @WebServlet("/time")
 public class TimeServlet extends HttpServlet {
+
     public static final String DEFAULT_TIME_ZONE = "UTC";
     public static final String DATE_PATTERN = "yyy-MM-dd HH:mm:ss z";
     public static final String TIME_ZONE_PARAM_NAME = "timezone";
     public static final String TIME_ZONE_COOKIE_NAME = "lastTimezone";
 
+    private TemplateEngine engine;
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
-        response.getWriter().write("<h1>Current time</h1>");
+    public void init() throws ServletException {
+        engine = new TemplateEngine();
 
-        ZoneId zone = ZoneId.of(getTimeZone(request, response));
+        FileTemplateResolver resolver = new FileTemplateResolver();
+        resolver.setPrefix("C:\\Users\\PC\\IdeaProjects\\M9_ThymeleafTest\\templates\\");
+        resolver.setSuffix(".html");
+        resolver.setTemplateMode("HTML5");
+        resolver.setOrder(engine.getTemplateResolvers().size());
+        resolver.setCacheable(false);
 
-        response.getWriter().write("<h2>Time zone: ${timeZone}</h2>".replace("${timeZone}", zone.toString()));
-        response.getWriter().write("<br>");
+        engine.addTemplateResolver(resolver);
+    }
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+
+        // Get time zone
+        ZoneId zone = ZoneId.of(getTimeZone(req, resp));
         // Get current time
         ZonedDateTime currentTime = ZonedDateTime.now(zone);
         // Set time template
@@ -36,8 +53,16 @@ public class TimeServlet extends HttpServlet {
         // Format time
         String formattedTime = dateTimeFormatter.format(currentTime);
 
-        response.getWriter().write(formattedTime);
-        response.getWriter().close();
+        Context context = new Context(req.getLocale(), Map.of(
+                "timezone", zone.toString(),
+                "formattedTime", formattedTime)
+        );
+
+        //Context simpleContext = new Context();
+        engine.process("time", context, resp.getWriter());
+        resp.getWriter().close();
+
+
     }
 
     /**
